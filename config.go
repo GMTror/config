@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -14,6 +13,7 @@ import (
 const (
 	tagName = "env"
 	valName = "default"
+	pasName = "-"
 )
 
 type Unmarshaler interface {
@@ -41,8 +41,6 @@ func ReadENV(i interface{}) error {
 }
 
 func decode(result reflect.Value, tag, defaultVal string) error {
-	log.Print(result.Kind())
-
 	switch result.Kind() {
 	case reflect.Int:
 		return decodeInt(result, tag, defaultVal)
@@ -407,7 +405,6 @@ func decodePtr(result reflect.Value, tag, defaultVal string) error {
 			if val == "" {
 				val = defaultVal
 			}
-			log.Print(tag)
 
 			if err := u.UnmarshalConfig(bytes.NewBufferString(val).Bytes()); err != nil {
 				return err
@@ -443,10 +440,13 @@ func decodeStruct(result reflect.Value, tag, defaultVal string) error {
 	resultType := result.Type()
 	for i := 0; i < resultType.NumField(); i++ {
 		fieldType := resultType.Field(i)
-		sTag := getTag(tag, fieldType.Tag.Get(tagName))
-		sVal := fieldType.Tag.Get(valName)
-		if err := decode(result.Field(i), sTag, sVal); err != nil {
-			return err
+		bTag := fieldType.Tag.Get(tagName)
+		if bTag != pasName {
+			sTag := getTag(tag, bTag)
+			sVal := fieldType.Tag.Get(valName)
+			if err := decode(result.Field(i), sTag, sVal); err != nil {
+				return err
+			}
 		}
 	}
 
