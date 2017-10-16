@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	tagName = "env"
-	valName = "default"
-	pasName = "-"
+	delimiterVal = ","
+	tagName      = "env"
+	valName      = "default"
+	pasName      = "-"
 )
 
 type Unmarshaler interface {
@@ -468,7 +469,7 @@ func decodeSlice(result reflect.Value, tag, defaultVal string) error {
 		}
 	}
 
-	for _, val := range strings.Split(tVal, ",") {
+	for _, val := range strings.Split(tVal, delimiterVal) {
 		r := reflect.Indirect(reflect.New(resultElemType))
 		decode(r, "", val)
 		rs = reflect.Append(rs, r)
@@ -494,15 +495,17 @@ func decodeMap(result reflect.Value, tag, defaultVal string) error {
 		}
 	}
 
-	for _, kv := range strings.Split(tVal, ",") {
-		vs := strings.SplitN(kv, ":", 2)
-		key := reflect.ValueOf(vs[0])
-		val := reflect.Indirect(reflect.New(resultElemType))
-		decode(val, "", vs[1])
-		rm.SetMapIndex(key, val)
-	}
+	if tVal != "" {
+		for _, kv := range strings.Split(tVal, delimiterVal) {
+			vs := strings.SplitN(kv, ":", 2)
+			key := reflect.ValueOf(vs[0])
+			val := reflect.Indirect(reflect.New(resultElemType))
+			decode(val, "", vs[1])
+			rm.SetMapIndex(key, val)
+		}
 
-	result.Set(rm)
+		result.Set(rm)
+	}
 
 	return nil
 }
