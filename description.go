@@ -70,17 +70,22 @@ func descriptionPrint(tag, des, defaultVal string) (description string) {
 		return ""
 	}
 	description = tag
-	if des == "" {
-		return
+	if des != "" {
+		description = fmt.Sprintf("%s - %s", tag, des)
 	}
-	description = fmt.Sprintf("%s - %s", tag, des)
 	if defaultVal == "" {
 		return
+	}
+	if des == "" {
+		description = fmt.Sprintf("%s -", tag)
 	}
 	return fmt.Sprintf("%s (defauilt: %s)", description, defaultVal)
 }
 
 func descriptionPtr(result reflect.Value, tag, des, defaultVal string) (string, error) {
+	if des != "" || defaultVal != "" {
+		return descriptionPrint(tag, des, defaultVal), nil
+	}
 	if result.IsNil() {
 		resultType := result.Type()
 		resultElemType := resultType.Elem()
