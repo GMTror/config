@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-
-	"log"
 )
 
 const (
@@ -15,7 +13,6 @@ const (
 func Description(i interface{}) (string, error) {
 	d, err := description(reflect.ValueOf(i), "", "", "")
 	if err != nil {
-		log.Print(err)
 		return "", err
 	}
 
@@ -86,25 +83,12 @@ func descriptionPtr(result reflect.Value, tag, des, defaultVal string) (string, 
 	if des != "" || defaultVal != "" {
 		return descriptionPrint(tag, des, defaultVal), nil
 	}
-	if result.IsNil() {
-		resultType := result.Type()
-		resultElemType := resultType.Elem()
-		resultNewType := reflect.New(resultElemType)
 
-		d, err := description(reflect.Indirect(resultNewType), tag, des, defaultVal)
-		if err != nil {
-			return "", err
-		}
-		return d, nil
-	} else {
-		d, err := description(reflect.Indirect(result), tag, des, defaultVal)
-		if err != nil {
-			return "", err
-		}
-		return d, nil
+	if _, ok := result.Interface().(Unmarshaler); ok {
+		return descriptionPrint(tag, des, defaultVal), nil
 	}
 
-	return "", nil
+	return description(reflect.Indirect(result), tag, des, defaultVal)
 }
 
 func descriptionStruct(result reflect.Value, tag, des, defaultVal string) (string, error) {
