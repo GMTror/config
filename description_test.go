@@ -1,6 +1,6 @@
 package config
 
-import (g
+import (
 	"testing"
 )
 
