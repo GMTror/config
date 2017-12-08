@@ -12,13 +12,14 @@ import (
 
 const (
 	delimiterVal = ","
+	delimiterMap = ":"
 	tagName      = "env"
 	valName      = "default"
 	pasName      = "-"
 )
 
 type Unmarshaler interface {
-	UnmarshalConfig([]byte) error
+	UnmarshalENV([]byte) error
 }
 
 func getTag(t1, t2 string) string {
@@ -407,7 +408,7 @@ func decodePtr(result reflect.Value, tag, defaultVal string) error {
 				val = defaultVal
 			}
 
-			if err := u.UnmarshalConfig(bytes.NewBufferString(val).Bytes()); err != nil {
+			if err := u.UnmarshalENV(bytes.NewBufferString(val).Bytes()); err != nil {
 				return err
 			}
 		} else {
@@ -424,7 +425,7 @@ func decodePtr(result reflect.Value, tag, defaultVal string) error {
 				val = defaultVal
 			}
 
-			if err := u.UnmarshalConfig(bytes.NewBufferString(val).Bytes()); err != nil {
+			if err := u.UnmarshalENV(bytes.NewBufferString(val).Bytes()); err != nil {
 				return err
 			}
 		} else {
@@ -497,7 +498,7 @@ func decodeMap(result reflect.Value, tag, defaultVal string) error {
 
 	if tVal != "" {
 		for _, kv := range strings.Split(tVal, delimiterVal) {
-			vs := strings.SplitN(kv, ":", 2)
+			vs := strings.SplitN(kv, delimiterMap, 2)
 			key := reflect.ValueOf(vs[0])
 			val := reflect.Indirect(reflect.New(resultElemType))
 			decode(val, "", vs[1])

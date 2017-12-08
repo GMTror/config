@@ -74,7 +74,7 @@ func descriptionPrint(tag, des, defaultVal string) (description string) {
 		return
 	}
 	if des == "" {
-		description = fmt.Sprintf("%s -", tag)
+		description = fmt.Sprintf("%s\t-", tag)
 	}
 	return fmt.Sprintf("%s (defauilt: %s)", description, defaultVal)
 }
