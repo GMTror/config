@@ -5,3 +5,4 @@ test:
 
 fmt:
 	go fmt .
+
