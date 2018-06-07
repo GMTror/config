@@ -3,7 +3,6 @@ package config
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"os"
 	"reflect"
 	"strconv"
@@ -25,7 +24,7 @@ type Unmarshaler interface {
 func getTag(t1, t2 string) string {
 	if t1 != "" {
 		if t2 != "" {
-			return fmt.Sprintf("%s_%s", t1, t2)
+			return t1 + "_" + t2
 		} else {
 			return t1
 		}
